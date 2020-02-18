@@ -1,2 +1,5 @@
-Django==2.0.5
+Django==2.2.10
+django-rest-passwordreset==1.1.0
+djangorestframework==3.11.0
 pytz==2018.5
+sqlparse==0.3.0
