@@ -88,7 +88,7 @@ class User(AbstractUser):
     username = models.CharField(_('username'), max_length=150,
                                 help_text=_('Required 150 characters or less. '
                                             'Letters, digits and @/./+/-/_ only.'),
-                                valudators=[username_validator],
+                                validators=[username_validator],
                                 error_messages={'unique': _(
                                     'A user with that username already exists.'),
                                 }, )
