@@ -29,10 +29,12 @@ class PartnerUpdate(APIView):
                                 status=403)
 
         url = request.data.get('url')
+
         if url:
             validate_url = URLValidator()
             try:
                 validate_url(url)
+                # print("Url is valid")
             except ValidationError as e:
                 return JsonResponse({'Status': False,
                                      'Error': str(e)})
@@ -78,5 +80,3 @@ class PartnerUpdate(APIView):
 
         return JsonResponse({'Status': False,
                              'Errors': 'Не указаны все необходимые аргументы'})
-
-
