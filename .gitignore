@@ -65,6 +65,7 @@ coverage.xml
 */migrations/*
 .log
 db.sqlite3
+settings-local.py
 
 
 # Scrapy stuff:
