@@ -179,6 +179,9 @@ class ProductInfo(models.Model):
             models.UniqueConstraint(fields=['product', 'shop', 'external_id'],
                                     name='unique_product_info'), ]
 
+    def __str__(self):
+        return f'{self.product} {_("from")} {self.shop}'
+
 
 class Parameter(models.Model):
     name = models.CharField(max_length=32, verbose_name='название')
@@ -213,11 +216,12 @@ class ProductParameter(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True,
                              verbose_name='пользователь', related_name='orders')
-    dt = models.DateTimeField(auto_now_add=True)
+    dt = models.DateTimeField(auto_now_add=True, verbose_name='дата создания')
     state = models.CharField(max_length=16, choices=STATE_CHOICES,
                              verbose_name='статус')
-    contact = models.ForeignKey('Contact', on_delete=models.CASCADE, blank=True,
-                                verbose_name='контакт')
+    contact = models.ForeignKey('Contact', on_delete=models.CASCADE,
+                                blank=True, null=True,
+                                verbose_name='контактные данные')
 
     class Meta:
         verbose_name = 'заказ'
@@ -255,7 +259,7 @@ class OrderItem(models.Model):
 
 
 class Contact(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True,
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True,
                              verbose_name='пользователь',
                              related_name='contacts')
     city = models.CharField(max_length=32, verbose_name='город')
@@ -268,11 +272,11 @@ class Contact(models.Model):
     phone = models.CharField(max_length=32, verbose_name='телефон')
 
     class Meta:
-        verbose_name = 'контакты пользователя'
-        verbose_name_plural = 'список контактов пользователя'
+        verbose_name = 'контактные данные пользователя'
+        verbose_name_plural = 'контактные данные пользователя'
 
     def __str__(self):
-        return f'{self.city}, {self.street} {self.house}'
+        return f'{self.city}, {self.street} {self.house} тел. {self.phone}'
 
 
 class ConfirmEmailToken(models.Model):
