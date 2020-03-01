@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
 from .models import User, Shop, Category, Product, ProductInfo,\
-    ProductParameter, Order, OrderItem, Contact, ConfirmEmailToken
+    ProductParameter, Order, OrderItem, Contact
 
 class ContactInline(admin.TabularInline):
     model = Contact

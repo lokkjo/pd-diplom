@@ -23,6 +23,17 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        max_length=100,
+        style={'placeholder': 'Email', 'autofocus': True}
+    )
+    password = serializers.CharField(
+        max_length=100,
+        style={'input_type': 'password', 'placeholder': 'Password'}
+    )
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category

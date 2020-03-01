@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
+from rest_framework.renderers import TemplateHTMLRenderer
 
 from requests import get
 from ujson import loads as load_json
@@ -446,13 +447,9 @@ class ContactView(APIView):
     Работа с контактами покупателей
     """
 
-    # проверяем, авторизован ли пользователь
-    def check_auth(self, request):
-        if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Вход не выполнен'},
-                                status=403)
-
     # получаем контакты
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'backends/contact.html'
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False,

@@ -239,6 +239,7 @@ class Order(models.Model):
     #     return self.ordered_items.aggregate(total=Sum('quantity'))['total'])
 
 
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True,
                               verbose_name='заказ',
@@ -259,7 +260,7 @@ class OrderItem(models.Model):
 
 
 class Contact(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True,
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True,
                              verbose_name='пользователь',
                              related_name='contacts')
     city = models.CharField(max_length=32, verbose_name='город')
