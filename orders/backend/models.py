@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from django.db import models
+from django.db.models import Sum
 
 from django.utils.translation import gettext_lazy as _
 from django_rest_passwordreset.tokens import get_token_generator
@@ -9,7 +10,7 @@ from django_rest_passwordreset.tokens import get_token_generator
 # Constant data to use in models
 
 STATE_CHOICES = (
-    ('basket', 'Статус корзины'),
+    ('basket', 'В корзине'),
     ('new', 'Новый'),
     ('confirmed', 'Подтвержден'),
     ('assembled', 'Собран'),
@@ -68,8 +69,8 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_staff=True')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True')
-        # if extra_fields.get('is_active') is not True:
-        #     raise ValueError('Superuser must have is_active=True')
+        if extra_fields.get('is_active') is not True:
+            raise ValueError('Superuser must have is_active=True')
 
         return self._create_user(email, password, **extra_fields)
 
@@ -231,12 +232,12 @@ class Order(models.Model):
     def __str__(self):
         return str(self.dt)
 
-    # @property
-    # def sum(self):
-    #     """
-    #     Общее количество всех позиций в заказе?
-    #     """
-    #     return self.ordered_items.aggregate(total=Sum('quantity'))['total'])
+    @property
+    def sum(self):
+        """
+        Общее количество всех позиций в заказе?
+        """
+        return self.ordered_items.aggregate(total=Sum('quantity'))['total']
 
 
 

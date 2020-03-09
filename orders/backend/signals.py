@@ -58,7 +58,7 @@ def new_order_signal(user_id, **kwargs):
     user =User.objects.get(id=user_id)
     msg = EmailMultiAlternatives(
         # Заголовок
-        f'Обновление статуса заказа'
+        f'Обновление статуса заказа',
         # Сообщение
         f'Заказ сформирован',
         # От:
