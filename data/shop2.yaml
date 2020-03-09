@@ -1,0 +1,62 @@
+shop: Хобби для любых возрастов
+categories:
+  - id: 32
+    name: Книги
+  - id: 283
+    name: Аксессуары для настольных игр
+  - id: 45
+    name: Настольные игры
+
+goods:
+  - id: 3216292
+    category: 283
+    model: chessex/dice/dice_set_red
+    name: Набор игральных костей Chessex красный
+    price: 1000
+    price_rrc: 1200
+    quantity: 14
+    parameters:
+      "Количество": 8
+      "В наборе": d4, d6, d8, d10, d10_percent, d12, d20, d100
+      "Упаковка": акриловый кейс
+      "Материал": пластмасса
+      "Цвет": красный
+  - id: 3216313
+    category: 283
+    model: chessex/dice/dice_set_gold
+    name: Набор игральных костей Chessex золотистый
+    price: 1250
+    price_rrc: 1400
+    quantity: 9
+    parameters:
+      "Количество": 8
+      "В наборе": d4, d6, d8, d10, d10_percent, d12, d20, d100
+      "Упаковка": акриловый кейс
+      "Материал": пластмасса
+      "Цвет": золотистый
+  - id: 3216226
+    category: 283
+    model: chessex/dice/dice_set_vtm
+    name: Набор игральных костей Chessex вампирский
+    price: 1100
+    price_rrc: 900
+    quantity: 12
+    parameters:
+      "Количество": 10
+      "В наборе": d10_vtm
+      "Упаковка": акриловый кейс
+      "Материал": пластмасса
+      "Цвет": чёрный с красным
+  - id: 3672670
+    category: 283
+    model: chessex/dice/dice_set_vtm_premium
+    name: Набор игральных костей Chessex вампирский Премиум
+    price: 4500
+    price_rrc: 5000
+    quantity: 2
+    parameters:
+      "Количество": 10
+      "В наборе": d10_vtm
+      "Упаковка": кожаный чехол-стаканчик
+      "Материал": металл
+      "Цвет": чёрный с красным
