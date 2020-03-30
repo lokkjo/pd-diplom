@@ -11,7 +11,7 @@
 
 ```python
 
-def password_reset_token_created(sender, instance, reset_password_token, **kwargs):
+def password_reset_token_created_message(sender, instance, reset_password_token, **kwargs):
     """
     Отправляем письмо с токеном для сброса пароля
     When a token is created, an e-mail needs to be sent to the user

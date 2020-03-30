@@ -1,0 +1,47 @@
+shop: Товары для программистов
+categories:
+  - id: 32
+    name: Книги
+  - id: 292
+    name: Аксессуары для компьютеров
+  - id: 51
+    name: Программистский кофе
+
+goods:
+  - id: 1112345
+    category: 32
+    model: books/programming/python_manual
+    name: Самое полное руководство по Python
+    price: 9999
+    price_rrc: 9998
+    quantity: 1
+    parameters:
+      "Автор": Гвидо Ван Россум
+      "Количество томов": 3
+      "Упаковка": деревянный пенал
+      "Материал": бумага, натуральная змеиная кожа
+      "Обложка": твёрдая
+  - id: 1112346
+    category: 32
+    model: books/programming/celery_manual
+    name: Студенческие комментарии по Celery
+    price: 123
+    price_rrc: 100
+    quantity: 234
+    parameters:
+      "Автор": Студенты Нетологии
+      "Количество томов": 62
+      "Упаковка": целлофановый пакет
+      "Материал": бумага
+  - id: 1112347
+    category: 32
+    model: books/programming/django_docs
+    name: Распечатка документации по Django
+    price: 500
+    price_rrc: 450
+    quantity: 31
+    parameters:
+      "Автор": Сообщество Django
+      "Количество томов": 1
+      "Материал": бумага
+      "Обложка": мягкая

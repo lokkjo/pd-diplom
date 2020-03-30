@@ -7,6 +7,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.db import IntegrityError
 from django.db.models import Q, Sum, F
 
+from celery import current_app
+
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -25,12 +27,16 @@ from .serializers import UserSerializer, CategorySerializer, ShopSerializer, \
     ContactSerializer
 from .signals import new_user_registered, new_order
 
+from .tasks import send_new_user_email_task, send_new_order_email_task, \
+    do_import_task
+
 # Наиболее часто повторяющиеся статусы ошибок
 
 NO_AUTH_STATUS = {'Status': False, 'Error': 'Необходимо авторизоваться'}
 LACK_OF_ARGS_STATUS = {'Status': False,
                        'Errors': 'Не указаны все необходимые аргументы'}
 SHOP_ONLY_STATUS = {'Status': False, 'Error': 'Только для магазинов'}
+ORDER_ERROR_STATUS = {'Status': False, 'Error': 'Ошибка обработки заказа'}
 
 # Views для работы с поставщиками
 
@@ -44,45 +50,10 @@ class PartnerUpdate(APIView):
             return JsonResponse(NO_AUTH_STATUS, status=401)
         if request.user.type != 'shop':
             return JsonResponse(SHOP_ONLY_STATUS, status=403)
+
         url = request.data.get('url')
         if url:
-            validate_url = URLValidator()
-            try:
-                validate_url(url)  # print("Url is valid")
-            except ValidationError as e:
-                return JsonResponse({'Status': False, 'Error': str(e)})
-            else:
-                stream = get(url).content
-
-            data = load_yaml(stream, Loader=Loader)
-
-            shop, _ = Shop.objects.get_or_create(name=data['shop'],
-                                                 user_id=request.user.id)
-            for category in data['categories']:
-                category_object, _ = Category.objects.get_or_create(
-                    id=category['id'], name=category['name'])
-                category_object.shops.add(shop.id)
-                category_object.save()
-
-            ProductInfo.objects.filter(shop_id=shop.id).delete()
-            for item in data['goods']:
-                product, _ = Product.objects.get_or_create(
-                    name=item['name'], category_id=item['category']
-                )
-                product_info = ProductInfo.objects.create(
-                    product_id=product.id, external_id=item['id'],
-                    model=item['model'], price=item['price'],
-                    price_rrc=item['price_rrc'], quantity=item['quantity'],
-                    shop_id=shop.id
-                )
-                for name, value in item['parameters'].items():
-                    parameter_object, _ = Parameter.objects.get_or_create(
-                        name=name
-                    )
-                    ProductParameter.objects.create(
-                        product_info_id=product_info.id,
-                        parameter_id=parameter_object.id, value=value
-                    )
+            task = do_import_task.delay(url)
 
             return JsonResponse({'Status': True})
 
@@ -182,8 +153,11 @@ class RegisterAccount(APIView):
                     user = user_serializer.save()
                     user.set_password(request.data['password'])
                     user.save()
-                    new_user_registered.send(sender=self.__class__,
-                                             user_id=user.id)
+
+                    task = send_new_user_email_task.delay(user.id)
+                    # new_user_registered.send(sender=self.__class__,
+                    #                          user_id=user.id)
+
                     return JsonResponse({'Status': True})
                 else:
                     print('user errors: ', user_serializer.errors)
@@ -335,10 +309,11 @@ class BasketView(APIView):
             return JsonResponse(NO_AUTH_STATUS, status=401)
 
         items_string = request.data.get('items')
-        print(items_string)
+        print('items string: ', items_string)
         if items_string:
             try:
                 order_item_dict = load_json(items_string)
+
             except ValueError as e:
                 return JsonResponse(
                     {'Status': False, 'Errors': f'Неверный формат запроса: {e}'})
@@ -346,10 +321,13 @@ class BasketView(APIView):
                 basket, _ = Order.objects.get_or_create(user_id=request.user.id,
                     state='basket')
                 objects_created = 0
-                # order_item_dict.update({'order': basket.id})
-                print('order_item_dict:', order_item_dict)
+
                 for order_item in order_item_dict:
+
                     order_item.update({'order': basket.id})
+
+                    print('order_item: ', order_item)
+
                     serializer = OrderItemSerializer(data=order_item)
                     if serializer.is_valid():
                         try:
@@ -527,6 +505,11 @@ class OrderView(APIView):
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
+        """
+        На вход - json с данными:
+        'id' - id заказа,
+        'contact' - контактные данные пользователя
+        """
         if not request.user.is_authenticated:
             return JsonResponse(NO_AUTH_STATUS, status=401)
 
@@ -536,13 +519,16 @@ class OrderView(APIView):
                     is_updated = Order.objects.filter(user_id=request.user.id,
                         id=request.data['id']).update(
                         contact_id=request.data['contact'], state='new')
-
                 except IntegrityError as error:
                     return JsonResponse(
                         {'Status': False, 'Errors': f'Неверные аргументы: {error}'})
                 else:
                     if is_updated:
-                        new_order.send(sender=self.__class__,
-                                       user_id=request.user.id)
+
+                        task = send_new_order_email_task.delay(request.user.id)
+                        # new_order.send(sender=self.__class__,
+                        #                user_id=request.user.id)
+
                         return JsonResponse({'Status': True})
+                    return JsonResponse(ORDER_ERROR_STATUS)
 

@@ -167,3 +167,12 @@ try:
 except:
     pass
 
+
+# CELERY STUFF
+BROKER_REDIS_PORT = '6379'
+BROKER_URL = f'redis://localhost:{BROKER_REDIS_PORT}'
+CELERY_RESULT_BACKEND = f'redis://localhost:{BROKER_REDIS_PORT}'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'
