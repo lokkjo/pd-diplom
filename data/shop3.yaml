@@ -1,7 +1,7 @@
 shop: Товары для программистов
 categories:
-  - id: 32
-    name: Книги
+  - id: 33
+    name: Книги для программистов
   - id: 292
     name: Аксессуары для компьютеров
   - id: 51
@@ -9,7 +9,7 @@ categories:
 
 goods:
   - id: 1112345
-    category: 32
+    category: 33
     model: books/programming/python_manual
     name: Самое полное руководство по Python
     price: 9999
@@ -22,7 +22,7 @@ goods:
       "Материал": бумага, натуральная змеиная кожа
       "Обложка": твёрдая
   - id: 1112346
-    category: 32
+    category: 33
     model: books/programming/celery_manual
     name: Студенческие комментарии по Celery
     price: 123
@@ -34,7 +34,7 @@ goods:
       "Упаковка": целлофановый пакет
       "Материал": бумага
   - id: 1112347
-    category: 32
+    category: 33
     model: books/programming/django_docs
     name: Распечатка документации по Django
     price: 500
