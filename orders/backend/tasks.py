@@ -6,26 +6,19 @@ from celery.utils.log import get_task_logger
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
-from django.core.validators import URLValidator
 
-from .models import ConfirmEmailToken, User
+from .models import User
 
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
-from django.contrib.auth import authenticate
-from django.contrib.auth.password_validation import validate_password
 from django.db import IntegrityError
-from django.db.models import Q, Sum, F
 
 from requests import get
-from ujson import loads as load_json
 from yaml import load as load_yaml, Loader
-from distutils.util import strtobool
 
 from .models import Shop, Category, Product, ProductInfo, Parameter, \
-    ProductParameter, Order, OrderItem, Contact, ConfirmEmailToken
+    ProductParameter, ConfirmEmailToken
 
 
 logger = get_task_logger(__name__)
@@ -88,7 +81,7 @@ def send_new_order_email_task(user_id, **kwargs):
     msg.send()
 
 @task(name="do_import")
-def do_import_task(url):
+def do_import_task(partner, url):
     # url = request.data.get('url')
     if url:
         validate_url = URLValidator()
@@ -100,9 +93,12 @@ def do_import_task(url):
             stream = get(url).content
 
         data = load_yaml(stream, Loader=Loader)
+        try:
+            shop, _ = Shop.objects.get_or_create(name=data['shop'],
+                                             user_id=partner)
+        except IntegrityError as e:
+            return JsonResponse({'Status': False, 'Error': str(e)})
 
-        shop, _ = Shop.objects.get_or_create(name=data['shop'],
-                                             user_id=request.user.id)
         for category in data['categories']:
             category_object, _ = Category.objects.get_or_create(
                 id=category['id'], name=category['name'])
@@ -128,44 +124,3 @@ def do_import_task(url):
                     product_info_id=product_info.id,
                     parameter_id=parameter_object.id, value=value
                 )
-
-
-
-
-#
-# # @receiver(new_user_registered)
-# def new_user_registered_message(user_id, **kwargs):
-#     """
-#     Отправляем письмо с подтверждением почтового ящика
-#     """
-#     token, _ = ConfirmEmailToken.objects.get_or_create(user_id=user_id)
-#     msg = EmailMultiAlternatives(
-#         # Заголовок письма
-#         f'Токен для подтверждения почты {token.user.email}',
-#         # Сообщение
-#         token.key,
-#         # От:
-#         settings.EMAIL_HOST_USER,
-#         # Кому:
-#         [token.user.email]
-#     )
-#     msg.send()
-#
-#
-# # @receiver(new_order)
-# def new_order_message(user_id, **kwargs):
-#     """
-#     Отправляем письмо об изменении статуса заказа
-#     """
-#     user =User.objects.get(id=user_id)
-#     msg = EmailMultiAlternatives(
-#         # Заголовок
-#         f'Обновление статуса заказа',
-#         # Сообщение
-#         f'Заказ сформирован',
-#         # От:
-#         settings.EMAIL_HOST_USER,
-#         # Кому:
-#         [user.email]
-#     )
-#     msg.send()

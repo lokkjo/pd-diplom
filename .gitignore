@@ -62,11 +62,11 @@ coverage.xml
 
 # Django stuff:
 
-*/migrations/*
+/*/migrations/
 .log
 db.sqlite3
 settings-local.py
-
+/orders/backend/migrations/
 
 # Scrapy stuff:
 .scrapy
@@ -114,3 +114,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 /orders/backend/jsontest.py
+

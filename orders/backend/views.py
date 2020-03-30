@@ -1,7 +1,7 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from django.http import JsonResponse
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
+# from django.core.validators import URLValidator
+# from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.db import IntegrityError
@@ -13,11 +13,11 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
-from rest_framework.renderers import TemplateHTMLRenderer
+# from rest_framework.renderers import TemplateHTMLRenderer
 
-from requests import get
+# from requests import get
 from ujson import loads as load_json
-from yaml import load as load_yaml, Loader
+# from yaml import load as load_yaml, Loader
 from distutils.util import strtobool
 
 from .models import Shop, Category, Product, ProductInfo, Parameter, \
@@ -25,7 +25,7 @@ from .models import Shop, Category, Product, ProductInfo, Parameter, \
 from .serializers import UserSerializer, CategorySerializer, ShopSerializer, \
     ProductInfoSerializer, OrderItemSerializer, OrderSerializer, \
     ContactSerializer
-from .signals import new_user_registered, new_order
+# from .signals import new_user_registered, new_order
 
 from .tasks import send_new_user_email_task, send_new_order_email_task, \
     do_import_task
@@ -53,7 +53,11 @@ class PartnerUpdate(APIView):
 
         url = request.data.get('url')
         if url:
-            task = do_import_task.delay(url)
+            try:
+                task = do_import_task.delay(request.user.id, url)
+            except IntegrityError as e:
+                return JsonResponse({'Status': False,
+                                     'Errors': f'Integrity Error: {e}'})
 
             return JsonResponse({'Status': True})
 
