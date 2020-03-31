@@ -13,7 +13,7 @@ def api_client():
     from rest_framework.test import APIClient
     return APIClient()
 
-# User fixtures
+# data fixtures
 
 @pytest.fixture
 def test_password():
@@ -40,6 +40,8 @@ def test_order():
     }
     return test_order_dict
 
+# user fixtures
+
 @pytest.fixture
 def partner_fixture(db, django_user_model, test_password):
     """
@@ -62,6 +64,8 @@ def api_client_with_credentials(db, partner_fixture, api_client):
     yield api_client
     api_client.force_authenticate(user=None)
 
+# tests
+
 @pytest.mark.django_db
 def test_partner_update_request(api_client_with_credentials):
     url = reverse('backend:partner-update')
@@ -82,7 +86,6 @@ def test_shop_request(api_client):
 def test_post_get_basket_requests(api_client_with_credentials, test_basket):
     url = reverse('backend:basket')
     post_rep = api_client_with_credentials.post(url, test_basket)
-    print('post: ', post_rep.json())
     assert post_rep.status_code == 200
     assert post_rep.json()['Status'] == True
     time.sleep(1)
@@ -105,24 +108,20 @@ def test_order_requests(api_client_with_credentials,
                         test_basket, test_contacts, test_order):
     basket_url = reverse('backend:basket')
     basket_post = api_client_with_credentials.post(basket_url, test_basket)
-    print('basket: ', basket_post.json())
     assert basket_post.status_code == 200
     assert basket_post.json()['Status'] == True
 
     contacts_url = reverse('backend:user-contact')
     contacts_post = api_client_with_credentials.post(contacts_url, test_contacts)
-    print('contacts: ', contacts_post.json())
     assert contacts_post.status_code == 200
     assert contacts_post.json()['Status'] == True
 
     order_url = reverse('backend:order')
     order_post = api_client_with_credentials.post(order_url, test_order)
-    print('order: ', order_post.json())
     assert order_post.status_code == 200
     assert order_post.json()['Status'] == True
 
     order_get = api_client_with_credentials.get(order_url)
-    print('order_get: ', order_get.json())
     assert order_get.status_code == 200
     assert order_get.json()[0]['id'] == 1
     assert len(order_get.json()[0]['ordered_items']) > 0
