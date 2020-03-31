@@ -303,7 +303,9 @@ class BasketView(APIView):
         ).annotate(
             total_sum=Sum(F('ordered_items__quantity')
                           * F('ordered_items__product_info__price'))
-        ).distinct()
+        ).distinct().order_by('-dt')
+
+        # .order_by added for compatibility with Django 3.1: RemovedInDjango31Warning
 
         serializer = OrderSerializer(basket, many=True)
         return Response(serializer.data)
@@ -314,7 +316,7 @@ class BasketView(APIView):
             return JsonResponse(NO_AUTH_STATUS, status=401)
 
         items_string = request.data.get('items')
-        print('items string: ', items_string)
+        # print('items string: ', items_string)
         if items_string:
             try:
                 order_item_dict = load_json(items_string)
@@ -504,7 +506,8 @@ class OrderView(APIView):
         ).annotate(
             total_sum=Sum(F('ordered_items__quantity')
                           * F('ordered_items__product_info__price'))
-        ).distinct()
+        ).distinct().order_by('-dt')
+        # order_by added for compatibility with Django 3.1: RemovedInDjango31Warning
 
         serializer = OrderSerializer(order, many=True)
         return Response(serializer.data)
