@@ -44,6 +44,7 @@ class PartnerUpdate(APIView):
     """
     Класс для обновления прайслиста от поставщика
     """
+    throttle_scope = 'uploads'
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
