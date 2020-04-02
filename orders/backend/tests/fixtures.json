@@ -144,14 +144,6 @@
     }
 },
 {
-    "model": "sessions.session",
-    "pk": "efdmnmv74ac2mcupq0uhjd9ayf8p3q64",
-    "fields": {
-        "session_data": "ODkwZDQ5Y2FmMTAzYzIwZWE5Mzg0OTZhZmVmZWFiYzg0MzUzYmZmNTp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJiMmYxMWZkMTk4ODU0MWJmYzNhMDQ3ZDJkYzFmYWE5YTY2MWZhN2I4In0=",
-        "expire_date": "2020-04-13T09:30:36.462Z"
-    }
-},
-{
     "model": "backend.category",
     "pk": 1,
     "fields": {
@@ -1411,7 +1403,6 @@
     "model": "backend.user",
     "pk": 1,
     "fields": {
-        "password": "pbkdf2_sha256$150000$bYhWD5uwystW$rrQZFGF+/v7NHLBq080bA3yiIikjTjxLKfFu4jnjZiU=",
         "last_login": "2020-03-30T09:30:36.456Z",
         "is_superuser": true,
         "first_name": "",
@@ -1432,7 +1423,6 @@
     "model": "backend.user",
     "pk": 2,
     "fields": {
-        "password": "pbkdf2_sha256$150000$BYFrKr4MhtI2$G9ah4E5R6X3wQUkUu4ilGPCul/Lz2mexRUOfoikg7rg=",
         "last_login": null,
         "is_superuser": false,
         "first_name": "Andrew",
@@ -1453,14 +1443,33 @@
     "model": "backend.user",
     "pk": 3,
     "fields": {
-        "password": "pbkdf2_sha256$150000$LezhwjmvY9ok$X1md772S/hQZug7PZd/y+512RG3rYJM2iXJ9kDpf/zQ=",
         "last_login": null,
         "is_superuser": false,
         "first_name": "Max",
         "last_name": "Plankett",
         "is_staff": false,
         "date_joined": "2020-03-30T09:37:24Z",
-        "email": "Max Plankett",
+        "email": "max@plankett.com",
+        "company": "The company",
+        "position": "The position",
+        "username": "",
+        "is_active": true,
+        "type": "shop",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "backend.user",
+    "pk": 4,
+    "fields": {
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "Alexander",
+        "last_name": "McCoy",
+        "is_staff": false,
+        "date_joined": "2020-03-30T09:37:24Z",
+        "email": "mccoy@shop.com",
         "company": "The company",
         "position": "The position",
         "username": "",
@@ -1486,7 +1495,7 @@
     "fields": {
         "name": "\u0425\u043e\u0431\u0431\u0438 \u0434\u043b\u044f \u043b\u044e\u0431\u044b\u0445 \u0432\u043e\u0437\u0440\u0430\u0441\u0442\u043e\u0432",
         "url": null,
-        "user": 3,
+        "user": 4,
         "state": true
     }
 }

@@ -51,7 +51,6 @@ class PartnerUpdate(APIView):
             return JsonResponse(NO_AUTH_STATUS, status=401)
         if request.user.type != 'shop':
             return JsonResponse(SHOP_ONLY_STATUS, status=403)
-
         url = request.data.get('url')
         if url:
             try:

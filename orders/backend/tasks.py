@@ -88,7 +88,7 @@ def do_import_task(partner, url):
         try:
             validate_url(url)  # print("Url is valid")
         except ValidationError as e:
-            return JsonResponse({'Status': False, 'Error': str(e)})
+            return {'Status': False, 'Error': str(e)}
         else:
             stream = get(url).content
 
@@ -97,7 +97,7 @@ def do_import_task(partner, url):
             shop, _ = Shop.objects.get_or_create(name=data['shop'],
                                              user_id=partner)
         except IntegrityError as e:
-            return JsonResponse({'Status': False, 'Error': str(e)})
+            return {'Status': False, 'Error': str(e)}
 
         for category in data['categories']:
             category_object, _ = Category.objects.get_or_create(
@@ -124,3 +124,12 @@ def do_import_task(partner, url):
                     product_info_id=product_info.id,
                     parameter_id=parameter_object.id, value=value
                 )
+        return {'Status': True}
+    return {'Status': False, 'Errors': 'url is false'}
+
+@task(name='mul')
+def mul(x, y):
+    """
+    Simple task for testing
+    """
+    return x * y

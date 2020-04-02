@@ -1,8 +1,11 @@
 import uuid
+import json
 import time
 import pytest
 from django.urls import reverse
 from pathlib import Path
+
+from ..models import User
 
 CURRENT_PATH = Path.cwd()
 
@@ -40,10 +43,17 @@ def test_order():
     }
     return test_order_dict
 
+@pytest.fixture
+def test_import():
+    test_import_dict = {
+        'url': 'https://raw.githubusercontent.com/lokkjo/pd-diplom/master/data/shop3.yaml'
+    }
+    return test_import_dict
+
 # user fixtures
 
-@pytest.fixture
-def partner_fixture(db, django_user_model, test_password):
+@pytest.fixture()
+def partner_fixture(django_user_model, test_password):
     """
     from djangostars.com/blog/django-pytest-testing/
     """
@@ -57,30 +67,36 @@ def partner_fixture(db, django_user_model, test_password):
     return make_user
 
 @pytest.fixture
-def api_client_with_credentials(db, partner_fixture, api_client):
-    user = partner_fixture()
-    print('User: ', user)
+def api_client_with_credentials(partner_fixture, api_client):
+    user = User.objects.get(pk=3)
+    user.set_password(test_password)
+    # user = partner_fixture()
     api_client.force_authenticate(user=user)
     yield api_client
     api_client.force_authenticate(user=None)
 
 # tests
 
-@pytest.mark.django_db
-def test_partner_update_request(api_client_with_credentials):
-    url = reverse('backend:partner-update')
-    data = {
-        "url": "https://raw.githubusercontent.com/lokkjo/pd-diplom/master/data/shop3.yaml"
-    }
-    response = api_client_with_credentials.post(url, data)
-    assert response.status_code == 200
-    assert response.json()['Status'] == True
+
 
 @pytest.mark.django_db
 def test_shop_request(api_client):
     url = reverse('backend:shops')
     response = api_client.get(url)
+    assert response.status_code == 200\
+
+@pytest.mark.django_db
+def test_category_request(api_client):
+    url = reverse('backend:categories')
+    response = api_client.get(url)
     assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_product_info_request(api_client):
+    url = reverse('backend:products')
+    response = api_client.get(url)
+    assert response.status_code == 200
+
 
 @pytest.mark.django_db
 def test_post_get_basket_requests(api_client_with_credentials, test_basket):
@@ -93,7 +109,7 @@ def test_post_get_basket_requests(api_client_with_credentials, test_basket):
     print('get: ', get_rep.json())
     assert get_rep.status_code == 200
 
-@pytest.mark.django_db
+# @pytest.mark.django_db
 def test_post_get_contacts_requests(api_client_with_credentials, test_contacts):
     url = reverse('backend:user-contact')
     post_rep = api_client_with_credentials.post(url, test_contacts)
@@ -103,7 +119,7 @@ def test_post_get_contacts_requests(api_client_with_credentials, test_contacts):
     print(get_rep.json())
     assert get_rep.status_code == 200
 
-@pytest.mark.django_db
+# @pytest.mark.django_db
 def test_order_requests(api_client_with_credentials,
                         test_basket, test_contacts, test_order):
     basket_url = reverse('backend:basket')
@@ -126,3 +142,23 @@ def test_order_requests(api_client_with_credentials,
     assert order_get.json()[0]['id'] == 1
     assert len(order_get.json()[0]['ordered_items']) > 0
 
+
+# celery tests
+from celery.contrib.pytest import  celery_session_app, celery_session_worker
+from ..tasks import mul, do_import_task
+
+
+@pytest.mark.usefixtures('celery_session_app')
+@pytest.mark.usefixtures('celery_session_worker')
+def celery_mul_test():
+    assert mul.delay(4,4).get(timeout=10) == 16
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('celery_session_app')
+@pytest.mark.usefixtures('celery_session_worker')
+def test_partner_update_request(api_client_with_credentials, test_import):
+    url = reverse('backend:partner-update')
+    response = api_client_with_credentials.post(url, test_import)
+    print()
+    assert response.status_code == 200
+    assert response.json()['Status'] == True
